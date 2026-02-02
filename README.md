@@ -58,10 +58,13 @@ Then open http://localhost:5000 in your browser.
 **Steps:**
 1. Connect your Android phone via USB
 2. Open Revolut app → Cards → Design card → Freeform drawing
-3. Click "Detect Area" in RevoDraw to capture the drawing boundaries
-4. Upload an image and adjust edge detection settings
-5. Position and transform your image using the preview
-6. Click "Start Drawing" to draw on your phone
+3. **Select the pen tool and set it to the smallest size** for optimal results
+4. Click "Detect Area" in RevoDraw to capture the drawing boundaries
+5. Upload an image and adjust edge detection settings
+6. Position and transform your image using the preview
+7. Click "Start Drawing" to draw on your phone
+
+> **Tip:** Using the smallest pen size gives the cleanest, most detailed results.
 
 ### CLI Tools
 
