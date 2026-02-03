@@ -34,7 +34,7 @@ You must enable **"USB debugging (Security settings)"** in Developer Options, th
 
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/revodraw.git
+git clone https://github.com/K53N0/revodraw.git
 cd revodraw
 
 # Create virtual environment
