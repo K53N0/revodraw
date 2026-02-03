@@ -66,6 +66,8 @@ Then open http://localhost:5000 in your browser.
 
 > **Tip:** Using the smallest pen size gives the cleanest, most detailed results.
 
+> **Warning:** Keep some margin from the detected boundaries - they're not always 100% accurate. If your image is placed too close to the edges, the drawing strokes may accidentally interact with UI elements in the Revolut app and disrupt the drawing process. If this happens, restart and use a slightly smaller scale or reposition the image away from the edges.
+
 ### CLI Tools
 
 **Draw shapes:**
@@ -107,6 +109,62 @@ python image_draw.py drawing.png --preview  # Preview without drawing
 
 - **Threshold** (0-255): Controls contour detection sensitivity
 - **Simplify** (0-10): Higher values = fewer points, faster drawing
+
+## Generating Images with AI
+
+For best results, use images with clean lines and high contrast. You can use AI image generators to create custom artwork that's optimized for RevoDraw.
+
+### Prompt Template
+
+Use this prompt with your preferred AI image generator (ChatGPT/DALL-E, Midjourney, Stable Diffusion, etc.):
+
+```
+Create a minimalist line art illustration filling the entire canvas.
+
+Requirements:
+- Black lines on white background (or white on black)
+- Clean, bold outlines with no gradients or shading
+- No fill colors, only strokes/outlines
+- High contrast, vector-style artwork
+- Consistent line thickness
+- Simple but striking design - avoid small intricate details
+
+Theme: [YOUR THEME - e.g., "cyberpunk skull", "geometric wolf", "coding/hacker aesthetic"]
+
+Style: Technical blueprint / line drawing / single-color stencil art
+
+Important: The design must work as a simple outline that could be traced.
+Avoid halftones, dots, textures, or soft edges.
+```
+
+### Using with Multimodal AI (Recommended)
+
+For best results, provide the AI with a screenshot of your detected drawing area:
+
+1. Click "Detect Area" in RevoDraw
+2. Take a screenshot of the preview showing the L-shaped drawing boundary
+3. Send the screenshot to a multimodal AI (ChatGPT-4, Claude, Gemini) with this prompt:
+
+```
+I want to draw a custom image on my Revolut card using an automated tool.
+The attached screenshot shows the available drawing area (the L-shaped region
+with two exclusion zones in the corners).
+
+Generate an image that:
+- Fits within this L-shaped boundary
+- Uses only black lines on white background
+- Has clean, bold outlines (no gradients, shading, or fills)
+- Is simple enough to be drawn with continuous strokes
+- Theme: [YOUR THEME]
+
+The image will be converted to paths using edge detection, so clean lines are essential.
+```
+
+### Tips for AI-Generated Images
+- Request "line art", "stencil", or "vector style"
+- Avoid: gradients, shading, photorealistic styles, fine details
+- Best styles: tribal art, geometric patterns, minimalist logos, blueprint drawings
+- If the result has too many details, ask the AI to "simplify" or make it "bolder"
 
 ## Troubleshooting
 
