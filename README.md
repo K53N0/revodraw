@@ -116,7 +116,7 @@ For best results, use images with clean lines and high contrast. You can use AI 
 
 ### Prompt Template
 
-Use this prompt with your preferred AI image generator (ChatGPT/DALL-E, Midjourney, Stable Diffusion, etc.):
+Use this prompt with your preferred AI image generator:
 
 ```
 Create a minimalist line art illustration filling the entire canvas.
@@ -143,7 +143,7 @@ For best results, provide the AI with a screenshot of your detected drawing area
 
 1. Click "Detect Area" in RevoDraw
 2. Take a screenshot of the preview showing the L-shaped drawing boundary
-3. Send the screenshot to a multimodal AI (ChatGPT-4, Claude, Gemini) with this prompt:
+3. Send the screenshot to a multimodal AI with this prompt:
 
 ```
 I want to draw a custom image on my Revolut card using an automated tool.
