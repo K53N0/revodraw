@@ -358,10 +358,25 @@ Examples:
                        help="Preview only, don't draw")
     parser.add_argument("--full-area", "-f", action="store_true",
                        help="Use full L-shaped area (content in VISA zone will be clipped)")
+    parser.add_argument("--serial", "-S", help="ADB device serial number")
     parser.add_argument("--debug", "-d", action="store_true",
                        help="Save debug images")
 
     args = parser.parse_args()
+
+    if args.serial:
+        import os
+        os.environ['ANDROID_SERIAL'] = args.serial
+    elif not os.environ.get('ANDROID_SERIAL'):
+        # Auto-pick physical device
+        try:
+            import os
+            import subprocess
+            res = subprocess.run(['adb', '-d', 'get-serialno'], capture_output=True, text=True, timeout=2)
+            if res.returncode == 0 and 'unknown' not in res.stdout.lower() and 'error' not in res.stdout.lower():
+                os.environ['ANDROID_SERIAL'] = res.stdout.strip()
+        except:
+            pass
 
     if not Path(args.image).exists():
         print(f"Error: Image not found: {args.image}")

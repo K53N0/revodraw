@@ -96,7 +96,7 @@ class DrawingArea:
 def capture_screenshot(output_path: str = "screen.png") -> str:
     """Capture screenshot via ADB."""
     print(f"Capturing screenshot to {output_path}...")
-    result = subprocess.run(['adb', 'exec-out', 'screencap', '-p'], capture_output=True)
+    result = subprocess.run(['adb', '-d', 'exec-out', 'screencap', '-p'], capture_output=True)
     if result.returncode != 0:
         raise RuntimeError(f"ADB screenshot failed: {result.stderr.decode()}")
 
@@ -104,11 +104,12 @@ def capture_screenshot(output_path: str = "screen.png") -> str:
     if len(data) < 8 or data[:4] != b'\x89PNG':
         # Fallback: capture on device then pull (avoids exec-out binary corruption)
         print("Direct capture produced invalid data, using fallback method...")
-        subprocess.run(['adb', 'shell', 'screencap', '-p', '/sdcard/screen_tmp.png'], check=True)
-        result = subprocess.run(['adb', 'pull', '/sdcard/screen_tmp.png', output_path], capture_output=True)
+        tmp_path = "/data/local/tmp/screen_tmp.png"
+        subprocess.run(['adb', '-d', 'shell', 'screencap', '-p', tmp_path], check=True)
+        result = subprocess.run(['adb', '-d', 'pull', tmp_path, output_path], capture_output=True)
         if result.returncode != 0:
             raise RuntimeError(f"ADB pull failed: {result.stderr.decode()}")
-        subprocess.run(['adb', 'shell', 'rm', '/sdcard/screen_tmp.png'])
+        subprocess.run(['adb', '-d', 'shell', 'rm', tmp_path])
     else:
         with open(output_path, 'wb') as f:
             f.write(data)
@@ -351,8 +352,23 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="Detect Revolut card drawing area")
     parser.add_argument("--screenshot", "-s", help="Path to screenshot")
+    parser.add_argument("--serial", "-S", help="ADB device serial number")
     parser.add_argument("--debug", "-d", action="store_true", help="Save debug images")
     args = parser.parse_args()
+
+    if args.serial:
+        import os
+        os.environ['ANDROID_SERIAL'] = args.serial
+    elif not os.environ.get('ANDROID_SERIAL'):
+        # Auto-pick physical device
+        try:
+            import os
+            import subprocess
+            res = subprocess.run(['adb', '-d', 'get-serialno'], capture_output=True, text=True, timeout=2)
+            if res.returncode == 0 and 'unknown' not in res.stdout.lower() and 'error' not in res.stdout.lower():
+                os.environ['ANDROID_SERIAL'] = res.stdout.strip()
+        except:
+            pass
 
     try:
         area = detect_from_screenshot(args.screenshot, debug=args.debug)

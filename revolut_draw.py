@@ -183,9 +183,24 @@ Examples:
     parser.add_argument("--y", type=int, help="Y coordinate (auto-detected if not set)")
     parser.add_argument("--size", type=int, default=60, help="Shape size")
     parser.add_argument("--no-detect", action="store_true", help="Skip auto-detection, use manual coords")
+    parser.add_argument("--serial", "-s", help="ADB device serial number")
     parser.add_argument("--debug", "-d", action="store_true", help="Save debug images during detection")
 
     args = parser.parse_args()
+
+    if args.serial:
+        import os
+        os.environ['ANDROID_SERIAL'] = args.serial
+    elif not os.environ.get('ANDROID_SERIAL'):
+        # Auto-pick physical device
+        try:
+            import os
+            import subprocess
+            res = subprocess.run(['adb', '-d', 'get-serialno'], capture_output=True, text=True, timeout=2)
+            if res.returncode == 0 and 'unknown' not in res.stdout.lower() and 'error' not in res.stdout.lower():
+                os.environ['ANDROID_SERIAL'] = res.stdout.strip()
+        except:
+            pass
 
     if not any([args.demo, args.text, args.heart, args.star, args.circle, args.spiral, args.interactive]):
         parser.print_help()
