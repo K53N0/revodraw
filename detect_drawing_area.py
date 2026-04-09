@@ -11,8 +11,25 @@ import numpy as np
 from dataclasses import dataclass
 from typing import Optional, Tuple, List
 import subprocess
+import shutil
 import sys
 import math
+
+
+_adb_path = None
+
+
+def get_adb_path():
+    """Find ADB executable. Caches result after first lookup."""
+    global _adb_path
+    if _adb_path is None:
+        _adb_path = shutil.which('adb')
+        if _adb_path is None:
+            raise FileNotFoundError(
+                "ADB not found. Install Android SDK Platform Tools and ensure 'adb' is in your PATH.\n"
+                "Download: https://developer.android.com/tools/releases/platform-tools"
+            )
+    return _adb_path
 
 
 @dataclass
@@ -96,7 +113,7 @@ class DrawingArea:
 def capture_screenshot(output_path: str = "screen.png") -> str:
     """Capture screenshot via ADB."""
     print(f"Capturing screenshot to {output_path}...")
-    result = subprocess.run(['adb', '-d', 'exec-out', 'screencap', '-p'], capture_output=True)
+    result = subprocess.run([get_adb_path(), '-d', 'exec-out', 'screencap', '-p'], capture_output=True)
     if result.returncode != 0:
         raise RuntimeError(f"ADB screenshot failed: {result.stderr.decode()}")
 
@@ -105,11 +122,11 @@ def capture_screenshot(output_path: str = "screen.png") -> str:
         # Fallback: capture on device then pull (avoids exec-out binary corruption)
         print("Direct capture produced invalid data, using fallback method...")
         tmp_path = "/data/local/tmp/screen_tmp.png"
-        subprocess.run(['adb', '-d', 'shell', 'screencap', '-p', tmp_path], check=True)
-        result = subprocess.run(['adb', '-d', 'pull', tmp_path, output_path], capture_output=True)
+        subprocess.run([get_adb_path(), '-d', 'shell', 'screencap', '-p', tmp_path], check=True)
+        result = subprocess.run([get_adb_path(), '-d', 'pull', tmp_path, output_path], capture_output=True)
         if result.returncode != 0:
             raise RuntimeError(f"ADB pull failed: {result.stderr.decode()}")
-        subprocess.run(['adb', '-d', 'shell', 'rm', tmp_path])
+        subprocess.run([get_adb_path(), '-d', 'shell', 'rm', tmp_path])
     else:
         with open(output_path, 'wb') as f:
             f.write(data)
@@ -364,7 +381,7 @@ if __name__ == "__main__":
         try:
             import os
             import subprocess
-            res = subprocess.run(['adb', '-d', 'get-serialno'], capture_output=True, text=True, timeout=2)
+            res = subprocess.run([get_adb_path(), '-d', 'get-serialno'], capture_output=True, text=True, timeout=2)
             if res.returncode == 0 and 'unknown' not in res.stdout.lower() and 'error' not in res.stdout.lower():
                 os.environ['ANDROID_SERIAL'] = res.stdout.strip()
         except:

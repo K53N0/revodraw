@@ -11,7 +11,7 @@ import time
 import math
 import sys
 from typing import List, Tuple
-from detect_drawing_area import detect_from_screenshot, DrawingArea
+from detect_drawing_area import detect_from_screenshot, DrawingArea, get_adb_path
 
 
 class ADBDrawer:
@@ -72,13 +72,13 @@ class ADBDrawer:
         self._verify_adb()
 
     def _verify_adb(self):
-        result = subprocess.run(['adb', 'devices'], capture_output=True, text=True)
+        result = subprocess.run([get_adb_path(), 'devices'], capture_output=True, text=True)
         if 'device' not in result.stdout.split('\n')[1]:
             raise RuntimeError("No ADB device connected")
 
     def swipe(self, x1: int, y1: int, x2: int, y2: int, duration: int = None):
         duration = duration or self.stroke_duration
-        subprocess.run(['adb', 'shell', 'input', 'swipe',
+        subprocess.run([get_adb_path(), '-d', 'shell', 'input', 'swipe',
                        str(int(x1)), str(int(y1)), str(int(x2)), str(int(y2)), str(duration)],
                       capture_output=True)
 
@@ -196,7 +196,7 @@ Examples:
         try:
             import os
             import subprocess
-            res = subprocess.run(['adb', '-d', 'get-serialno'], capture_output=True, text=True, timeout=2)
+            res = subprocess.run([get_adb_path(), '-d', 'get-serialno'], capture_output=True, text=True, timeout=2)
             if res.returncode == 0 and 'unknown' not in res.stdout.lower() and 'error' not in res.stdout.lower():
                 os.environ['ANDROID_SERIAL'] = res.stdout.strip()
         except:

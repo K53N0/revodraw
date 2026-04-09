@@ -22,7 +22,7 @@ from pathlib import Path
 from typing import List, Tuple, Optional
 from dataclasses import dataclass
 
-from detect_drawing_area import detect_from_screenshot, DrawingArea
+from detect_drawing_area import detect_from_screenshot, DrawingArea, get_adb_path
 
 
 @dataclass
@@ -218,7 +218,7 @@ def draw_paths_adb(paths: List[List[Tuple[int, int]]],
             x1, y1 = path[j]
             x2, y2 = path[j + 1]
             subprocess.run(
-                ['adb', 'shell', 'input', 'swipe',
+                [get_adb_path(), '-d', 'shell', 'input', 'swipe',
                  str(x1), str(y1), str(x2), str(y2), str(stroke_duration)],
                 capture_output=True
             )
@@ -372,7 +372,7 @@ Examples:
         try:
             import os
             import subprocess
-            res = subprocess.run(['adb', '-d', 'get-serialno'], capture_output=True, text=True, timeout=2)
+            res = subprocess.run([get_adb_path(), '-d', 'get-serialno'], capture_output=True, text=True, timeout=2)
             if res.returncode == 0 and 'unknown' not in res.stdout.lower() and 'error' not in res.stdout.lower():
                 os.environ['ANDROID_SERIAL'] = res.stdout.strip()
         except:

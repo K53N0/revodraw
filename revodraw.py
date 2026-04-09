@@ -26,7 +26,7 @@ import cv2
 import numpy as np
 from flask import Flask, render_template_string, request, jsonify, send_file
 
-from detect_drawing_area import detect_from_screenshot, capture_screenshot, DrawingArea
+from detect_drawing_area import detect_from_screenshot, capture_screenshot, DrawingArea, get_adb_path
 
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB max upload
@@ -2335,7 +2335,7 @@ def draw():
                     x1, y1 = path[j]
                     x2, y2 = path[j + 1]
                     subprocess.run(
-                        ['adb', 'shell', 'input', 'swipe',
+                        [get_adb_path(), '-d', 'shell', 'input', 'swipe',
                          str(x1), str(y1), str(x2), str(y2), str(stroke_duration)],
                         capture_output=True
                     )
